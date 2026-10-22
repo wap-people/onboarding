@@ -338,6 +338,63 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   .logo{width:clamp(96px,9vw,13rem)}
   .rh{max-width:none}.cols3,.rule{max-width:65rem}.s5 .body,.s8 .body,.s9 .body{max-width:69rem}
 }
+/* ---------- efeitos de movimento (estilo páginas de produto Apple) ---------- */
+:root{--ease:cubic-bezier(.22,1,.36,1);--nav-h:48px}
+/* barra local fixa com vidro fosco + progresso de leitura */
+.lnav{position:fixed;top:0;left:0;right:0;z-index:30;height:calc(var(--nav-h) + env(safe-area-inset-top,0px));
+  padding:env(safe-area-inset-top,0px) var(--pad-x) 0;display:flex;align-items:center;gap:1rem;
+  background:rgba(0,0,0,.6);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);
+  border-bottom:1px solid rgba(255,255,255,.1);transform:translateY(-102%);transition:transform .6s var(--ease)}
+.lnav.show{transform:none}
+.lnav-t{font-weight:700;font-size:1rem;letter-spacing:-.01em;white-space:nowrap;text-decoration:none}
+.lnav-t span{font-weight:200}
+.lnav-s{flex:1;min-width:0;font-weight:200;font-size:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.8;
+  border-left:1px solid rgba(255,255,255,.2);padding-left:1rem;transition:opacity .3s,transform .3s var(--ease)}
+.lnav-s.swap{opacity:0;transform:translateY(6px)}
+.lnav-b{flex:none;display:inline-flex;align-items:center;gap:.4em;padding:.42em 1.1em;border-radius:999px;background:var(--green);color:#000;
+  font-weight:700;font-size:.8rem;text-decoration:none;transition:background .2s,transform .2s}
+.lnav-b:hover,.lnav-b:focus-visible{background:#fff}
+.lnav-p{position:absolute;left:0;bottom:-1px;width:100%;height:2px;background:var(--green);transform-origin:0 50%;transform:scaleX(var(--p,0))}
+.js .slide:not(.s1){padding-top:calc(var(--pad-y) + var(--nav-h))}
+.js .s2 .hang{top:var(--nav-h)}
+@media (max-width:640px){.lnav-t span{display:none}.lnav{gap:.75rem}.lnav-s{padding-left:.75rem}}
+
+/* toque: leve "afundar" ao pressionar, como na Apple */
+.menu-card:active,.cta:active,.back:active,.store:active,.lnav-b:active,.qrs a:active{transform:scale(.97)}
+
+/* revelação em cascata ao rolar */
+.fx [data-r]{opacity:0;transform:translate3d(0,44px,0);
+  transition:opacity .9s var(--ease),transform 1.1s var(--ease),filter 1s var(--ease);transition-delay:calc(var(--i,0) * 90ms)}
+.fx [data-r="blur"]{filter:blur(12px);transform:translate3d(0,28px,0) scale(.98)}
+.fx [data-r="scale"]{transform:scale(.86)}
+.fx [data-r="drop"]{transform:translate3d(0,-70%,0)}
+.fx [data-r="left"]{transform:translate3d(-36px,0,0)}
+.fx [data-r].in{opacity:1;transform:none;filter:none}
+
+/* linhas que se desenham */
+.fx .cover-inner{position:relative;border-left-color:transparent}
+.fx .cover-inner::before{content:"";position:absolute;left:calc(-1 * clamp(3px,.35vw,5px));top:0;bottom:0;width:clamp(3px,.35vw,5px);
+  background:var(--green);transform:scaleY(0);transform-origin:top;transition:transform 1.4s var(--ease) .15s}
+.fx .cover-inner.drawn::before{transform:none}
+.fx .tl-list li[data-r]::after{transform:scaleY(0);transform-origin:top;transition:transform 1s var(--ease);transition-delay:calc(var(--i,0) * 90ms + 350ms)}
+.fx .tl-list li.in::after{transform:none}
+.fx .kicker::after{transform:scaleX(0);transform-origin:left;transition:transform 1s var(--ease) .2s}
+.fx .kicker.drawn::after{transform:none}
+.fx .track::before{transform:scaleX(0);transform-origin:left;transition:transform 1.6s var(--ease) .25s}
+.fx .track.drawn::before{transform:none}
+.fx .rule{transform-origin:left}
+.fx .rule[data-r]{transform:scaleX(0)}
+.fx .rule.in{transform:none}
+
+/* palavras que acendem conforme a rolagem */
+.fx .w{opacity:.2;transition:opacity .35s ease}
+.fx .w.on{opacity:1}
+
+/* elementos ligados à rolagem: só transform/opacity (GPU) */
+.fx .glow,.fx .phone,.fx .cover-inner,.fx .s14 .end img{will-change:transform}
+
+@media (prefers-reduced-motion:reduce){.lnav,.lnav-s,.lnav-b{transition:none}}
+@media print{.lnav{display:none}.js .slide:not(.s1){padding-top:var(--pad-y)}}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.dots a,.store,.menu-card,.cta,.back{transition:none}}
 @media print{.dots,.foot,.cta{display:none}.slide{min-height:auto;page-break-after:always}}
 </style>
@@ -639,6 +696,12 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
   <div class="foot"><a class="back" href="#menu"><span aria-hidden="true">←</span> Voltar ao menu inicial</a><span class="pg">Encerramento</span></div>
 </section>
 
+<header class="lnav" aria-label="Navegação do onboarding">
+  <a class="lnav-t" href="#s1">Onboarding <span>· ADM de Pessoas</span></a>
+  <span class="lnav-s" aria-live="polite"></span>
+  <a class="lnav-b" href="#menu"><span aria-hidden="true">☰</span> Menu</a>
+  <span class="lnav-p" aria-hidden="true"></span>
+</header>
 <nav class="dots" aria-label="Navegação entre slides"></nav>
 
 <script>
@@ -671,6 +734,155 @@ a:focus-visible{outline:2px solid var(--green);outline-offset:3px}
     if(k==='Home')n=0; if(k==='End')n=slides.length-1;
     if(n!==null){e.preventDefault();slides[n].scrollIntoView({behavior:B});}
   });
+})();
+</script>
+<script>
+/* Efeitos de rolagem: barra local, cascata, linhas, contadores, palavras e parallax */
+(function(){
+  var doc=document.documentElement;
+  doc.classList.add('js');
+  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var slides=[].slice.call(document.querySelectorAll('.slide'));
+  var nav=document.querySelector('.lnav'),navS=nav.querySelector('.lnav-s'),navP=nav.querySelector('.lnav-p');
+  var vh=innerHeight,lastLabel='';
+  function clamp(v,a,b){return v<a?a:v>b?b:v}
+
+  /* ---- barra local ---- */
+  function updateNav(){
+    var mid=vh*.4,c=0;
+    slides.forEach(function(s,i){if(s.getBoundingClientRect().top<=mid)c=i;});
+    nav.classList.toggle('show',c>0);
+    var label=c>0?(slides[c].getAttribute('aria-label')||''):'';
+    if(label!==lastLabel){
+      lastLabel=label;
+      if(reduce){navS.textContent=label;}
+      else{navS.classList.add('swap');setTimeout(function(){navS.textContent=lastLabel;navS.classList.remove('swap');},180);}
+    }
+    var max=doc.scrollHeight-vh;
+    navP.style.setProperty('--p',max>0?clamp(scrollY/max,0,1).toFixed(4):0);
+  }
+
+  if(reduce){addEventListener('scroll',updateNav,{passive:true});addEventListener('resize',function(){vh=innerHeight;updateNav();});updateNav();return;}
+  doc.classList.add('fx');
+
+  /* ---- marca elementos para a cascata ---- */
+  var groups={
+    '.cover-inner > *':'',
+    '.s2 .hang > span':'drop',
+    '.menu-grid > a':'','.values > .value':'scale','.tl-list > li':'left',
+    '.cols3 > div':'','.pay > div':'scale','.track > .item':'scale','.contacts > .contact':'',
+    '.rh-left > div':'','.qrs > a':'','.two > div':'','.howto > div':'','.left-cta > *':''
+  };
+  Object.keys(groups).forEach(function(sel){
+    var seen=new Map();
+    [].forEach.call(document.querySelectorAll(sel),function(el){
+      var p=el.parentNode,i=seen.get(p)||0;seen.set(p,i+1);
+      el.setAttribute('data-r',groups[sel]);el.style.setProperty('--i',Math.min(i,10));
+    });
+  });
+  var singles=['.title','.reg-title','.lt-title','.s2 .eyebrow','.s2 .sub','.s2 .lead','.s2 .para','.menu-lead',
+    '.box-green','.lime-box','.vr-qr','.rule','.content > .body','.split > div > .body','.s8 .center > .body','.s9 .center > .body'];
+  [].forEach.call(document.querySelectorAll(singles.join(',')),function(el){
+    if(el.closest('[data-r]')||el.querySelector('[data-r]'))return;
+    var blur=el.matches('.title,.reg-title,.lt-title');
+    el.setAttribute('data-r',blur?'blur':'');
+    /* títulos primeiro, textos logo depois */
+    if(!blur)el.style.setProperty('--i',el.matches('.s2 .lead,.s2 .para')?2:1);
+  });
+
+  /* ---- palavras que acendem (manifesto e fechamento) ---- */
+  var scrubs=[document.querySelector('.s2 .para'),document.querySelector('.s5 .content > .body:last-child')].filter(Boolean).map(function(el){
+    var tw=document.createTreeWalker(el,NodeFilter.SHOW_TEXT,null),nodes=[],n;
+    while((n=tw.nextNode()))nodes.push(n);
+    nodes.forEach(function(t){
+      var f=document.createDocumentFragment();
+      t.nodeValue.split(/(\s+)/).forEach(function(part){
+        if(!part)return;
+        if(/^\s+$/.test(part)){f.appendChild(document.createTextNode(part));return;}
+        var s=document.createElement('span');s.className='w';s.textContent=part;f.appendChild(s);
+      });
+      t.parentNode.replaceChild(f,t);
+    });
+    return {el:el,slide:el.closest('.slide'),words:[].slice.call(el.querySelectorAll('.w'))};
+  });
+
+  /* ---- contadores ---- */
+  function count(el){
+    var txt=el.textContent.trim(),m=txt.match(/^(\D*)(\d+(?:[.,]\d+)?)(\D*)$/);
+    if(!m)return;
+    var dec=(m[2].split(',')[1]||'').length,target=parseFloat(m[2].replace(/\./g,'').replace(',','.')),t0=null,dur=1400;
+    el.style.fontVariantNumeric='tabular-nums';
+    function fmt(v){return m[1]+v.toFixed(dec).replace('.',',')+m[3]}
+    function step(ts){
+      if(!t0)t0=ts;var k=clamp((ts-t0)/dur,0,1),e=1-Math.pow(1-k,4);
+      el.textContent=k<1?fmt(target*e):txt;
+      if(k<1)requestAnimationFrame(step);
+    }
+    el.textContent=fmt(0);requestAnimationFrame(step);
+  }
+
+  /* ---- observador de entrada ---- */
+  var reveal=[].slice.call(document.querySelectorAll('[data-r]'));
+  var draws=[].slice.call(document.querySelectorAll('.cover-inner,.kicker,.track'));
+  var counters=[].slice.call(document.querySelectorAll('.pay .big,.track .val'));
+  function done(el){
+    var d=(parseFloat(el.style.getPropertyValue('--i'))||0)*90+1600;
+    setTimeout(function(){el.removeAttribute('data-r');el.style.removeProperty('--i');},d);
+  }
+  if(!('IntersectionObserver' in window)){
+    reveal.forEach(function(el){el.classList.add('in')});draws.forEach(function(el){el.classList.add('drawn')});
+  }else{
+    var io=new IntersectionObserver(function(es){
+      es.forEach(function(e){
+        if(!e.isIntersecting)return;
+        var el=e.target;io.unobserve(el);
+        if(el.hasAttribute('data-r')){el.classList.add('in');done(el);}
+        else if(counters.indexOf(el)>-1){count(el);}
+        else el.classList.add('drawn');
+      });
+    },{threshold:.12,rootMargin:'0px 0px -6% 0px'});
+    reveal.concat(draws,counters).forEach(function(el){io.observe(el)});
+  }
+
+  var pending=reveal.concat(draws);
+
+  /* ---- rolagem: parallax, palavras e objetos ligados ao scroll ---- */
+  var cover=document.querySelector('.cover-inner'),phone=document.querySelector('.s4 .phone'),
+      endLogo=document.querySelector('.s14 .end img'),ticking=false;
+  function enter(s){return clamp(1-s.getBoundingClientRect().top/vh,0,1)}
+  function frame(){
+    ticking=false;
+    var small=innerWidth<=640;
+    /* capa: afasta e desvanece ao sair, como o hero da Apple */
+    var y=scrollY,q=clamp(y/vh,0,1);
+    if(cover){cover.style.transform='translate3d(0,'+(y*.35).toFixed(1)+'px,0) scale('+(1-q*.06).toFixed(4)+')';cover.style.opacity=(1-q*.85).toFixed(3);}
+    /* brilhos de fundo em profundidade */
+    if(!small)slides.forEach(function(s){
+      var r=s.getBoundingClientRect();if(r.bottom<-vh||r.top>vh*2)return;
+      var off=(r.top+r.height/2-vh/2)*-.18;
+      [].forEach.call(s.querySelectorAll('.glow'),function(g){g.style.transform='translate3d(0,'+off.toFixed(1)+'px,0) rotate(36deg)'});
+    });
+    /* celular do Super VR sobe e endireita */
+    if(phone){var p=1-enter(phone.closest('.slide'));phone.style.transform='translate3d(0,'+(p*90).toFixed(1)+'px,0) rotate('+(p*-8).toFixed(2)+'deg)';}
+    /* logo final cresce ao chegar */
+    if(endLogo){var e=enter(endLogo.closest('.slide'));endLogo.style.transform='scale('+(.82+e*.18).toFixed(4)+')';endLogo.style.opacity=(.15+e*.85).toFixed(3);}
+    /* palavras acendem: completas quando o slide encosta no topo */
+    scrubs.forEach(function(o){
+      var a=enter(o.slide)/.9,b=(vh-o.el.getBoundingClientRect().top)/(vh*.55),k=clamp(Math.max(a,b),0,1),
+          lit=Math.round(k*o.words.length);
+      o.words.forEach(function(w,i){w.classList.toggle('on',i<lit)});
+    });
+    /* garantia: tudo que já passou pela tela (saltos por link) fica visível */
+    for(var i=pending.length-1;i>=0;i--){
+      var el=pending[i];if(el.classList.contains('in')||el.classList.contains('drawn')){pending.splice(i,1);continue;}
+      if(el.getBoundingClientRect().top<vh){pending.splice(i,1);if(el.hasAttribute('data-r')){el.classList.add('in');done(el);}else el.classList.add('drawn');}
+    }
+    updateNav();
+  }
+  function onScroll(){if(!ticking){ticking=true;requestAnimationFrame(frame);}}
+  addEventListener('scroll',onScroll,{passive:true});
+  addEventListener('resize',function(){vh=innerHeight;onScroll();});
+  frame();
 })();
 </script>
 </body>
